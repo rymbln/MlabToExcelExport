@@ -9,7 +9,8 @@
     </Window.DataContext>
     <ScrollViewer>
         <StackPanel>
-            <Button Click="Button_Click">GetExcel</Button>
+            <Button Click="Button_Click">GetExcel1</Button>
+            <Button Click="Button_Click_Other">GetExcel2</Button>
             <DataGrid x:Name ="Grid" ItemsSource="{Binding Set}" AutoGenerateColumns="True"></DataGrid>
         </StackPanel>
     </ScrollViewer>

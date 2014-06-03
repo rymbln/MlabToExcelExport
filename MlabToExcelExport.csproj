@@ -83,8 +83,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ExportToExcel.cs" />
-    <Compile Include="SetItem.cs" />
-    <Compile Include="SetRow.cs" />
     <Compile Include="SetViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
