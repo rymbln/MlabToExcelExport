@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +19,8 @@ namespace MlabToExcelExport
 {
     public static class ExportToExcel
     {
+        private static string filename { get; set; }
+
         private static Excel.Application CreateExcelObj()
         {
             object obj;
@@ -75,16 +79,16 @@ namespace MlabToExcelExport
             sheet.Range[sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3
                 , 4], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3, obj.Set.Count() + 3]].Orientation = 90;
 
-            sheet.Range[sheet.Cells[2,1], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3, 1]].ColumnWidth = 5;
-            sheet.Range[sheet.Cells[2, 2], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3,2]].ColumnWidth = 9;
+            sheet.Range[sheet.Cells[2, 1], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3, 1]].ColumnWidth = 5;
+            sheet.Range[sheet.Cells[2, 2], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3, 2]].ColumnWidth = 9;
             sheet.Range[sheet.Cells[2, 3], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3, 3]].ColumnWidth = 15;
 
-            FormatHeaderControlMOText2(sheet.Range[sheet.Cells[obj.Set.First().MOList.Count +3, 1], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3, 3 + obj.Set.Count]]);
- 
-           
+            FormatHeaderControlMOText2(sheet.Range[sheet.Cells[obj.Set.First().MOList.Count + 3, 1], sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3, 3 + obj.Set.Count]]);
 
 
-            sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 7,2] = "Проверил:";
+
+
+            sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 7, 2] = "Проверил:";
         }
         private static void FormatSheetForSet1(Excel.Worksheet sheet, SetItem obj)
         {
@@ -211,101 +215,113 @@ namespace MlabToExcelExport
             range.ColumnWidth = 10;
         }
 
-        public static void GetExcelDocumentSet1(SetViewModel obj)
+        public static string GetExcelDocumentSet(SetViewModel obj, string filePath, int setType)
         {
+            Excel.Application ExcelApp;
+            Excel.Worksheet ExcelSheet;
+            Excel.Workbook ExcelWorkbook;
+            Excel.Workbooks ExcelWorkbooks;
+            Excel.Range ExcelRange;
+            int rowsCount;
+            int columnsCount;
+            dynamic data;
 
-            Excel.Application ExcelApp = CreateExcelObj();
-            ExcelApp.ScreenUpdating = false;
-            Excel.Workbook ExcelWorkbook = ExcelApp.ActiveWorkbook;
 
             try
             {
-                foreach (var itemSet in obj.Set)
+                if (String.IsNullOrEmpty(filePath))
                 {
-                    Excel.Worksheet ExcelSheet = ExcelWorkbook.Sheets.Add();
-
-                    var rowsCount = itemSet.MOList.Count + 8 + itemSet.ControlMOList.Count + 1;
-                    var columnsCount = itemSet.MICList.Count + 5;
-
-                    Excel.Range ExcelRange =
-                        ExcelSheet.Range[ExcelSheet.Cells[1, 1], ExcelSheet.Cells[rowsCount, columnsCount]];
-
-                    ExcelSheet.Name = itemSet.AB;
-
-
-                    var data = PrepareListForSet1(itemSet);
-
-
-                    ExcelRange.Value = data;
-                    FormatSheetForSet1(ExcelSheet, itemSet);
-
+                    filePath = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)).FullName;
+                    //if (Environment.OSVersion.Version.Major >= 6)
+                    //{
+                    //    filePath = Directory.GetParent(filePath).FullName;
+                    //}
                 }
+                filename = obj.Set.First().Project + " - Сет " + obj.Set.First().Set + " - " +
+                           obj.Set.First().TestMethod + ".xlsx";
 
-                ExcelWorkbook.Sheets[obj.Set.Count + 1].Delete();
-                ExcelWorkbook.Sheets[obj.Set.Count + 1].Delete();
-            
+                ExcelApp = CreateExcelObj();
+                ExcelWorkbooks = ExcelApp.Workbooks;
+                ExcelApp.ScreenUpdating = false;
+                ExcelApp.DisplayAlerts = false;
+                ExcelWorkbook = ExcelWorkbooks.Add();
 
-                ExcelApp.ScreenUpdating = true;
-                ExcelApp.Visible = true;
+
+                switch (setType)
+                {
+                    case 1:
+                        foreach (var itemSet in obj.Set)
+                        {
+                            ExcelSheet = ExcelWorkbook.Sheets.Add();
+
+                            rowsCount = itemSet.MOList.Count + 8 + itemSet.ControlMOList.Count + 1;
+                            columnsCount = itemSet.MICList.Count + 5;
+
+                            ExcelRange =
+                                ExcelSheet.Range[ExcelSheet.Cells[1, 1], ExcelSheet.Cells[rowsCount, columnsCount]];
+
+                            ExcelSheet.Name = itemSet.AB;
+
+                            data = PrepareListForSet1(itemSet);
+
+                            ExcelRange.Value = data;
+                            FormatSheetForSet1(ExcelSheet, itemSet);
+                            Marshal.ReleaseComObject(ExcelRange);
+                            Marshal.ReleaseComObject(ExcelSheet);
+
+                        }
+                        break;
+                    case 2:
+                        ExcelSheet = ExcelWorkbook.Sheets.Add();
+                        rowsCount = obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3;
+                        columnsCount = obj.Set.Count + 3;
+
+                        ExcelRange = ExcelSheet.Range[ExcelSheet.Cells[1, 1], ExcelSheet.Cells[rowsCount, columnsCount]];
+
+                        ExcelSheet.Name = obj.Set.First().Project + " - Сет № " + obj.Set.First().Set;
+
+                        data = PrepareListForSet2(obj);
+
+                        ExcelRange.Value = data;
+                        FormatSheetForSet2(ExcelSheet, obj);
+                        Marshal.ReleaseComObject(ExcelRange);
+                        Marshal.ReleaseComObject(ExcelSheet);
+                        break;
+                    default:
+                        break;
+                }
+                ExcelWorkbook.SaveAs();
+                ExcelWorkbook.SaveAs(filePath + "\\" + filename, Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, false, false, Excel.XlSaveAsAccessMode.xlNoChange, Excel.XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
+
+
+                while (Marshal.ReleaseComObject(ExcelWorkbook) > 0)
+                { }
+                while (Marshal.ReleaseComObject(ExcelWorkbooks) > 0)
+                { }
+
+
+                ExcelApp.Quit();
+
+                while (Marshal.ReleaseComObject(ExcelApp) > 0)
+                { }
+
+                return filePath + "\\" + filename;
+
             }
             catch (Exception ex)
             {
-
+                return ex.Data + "\\r\\n" + ex.Message + "\\r\\n" + ex.Source + "\\r\\n" +
+                       ex.StackTrace;
             }
             finally
             {
-                ExcelWorkbook = null;
-                ExcelApp = null;
+                
                 GC.Collect();
+
             }
         }
 
-        public static void GetExcelDocumentSet2(SetViewModel obj)
-        {
 
-            Excel.Application ExcelApp = CreateExcelObj();
-            ExcelApp.ScreenUpdating = false;
-            Excel.Workbook ExcelWorkbook = ExcelApp.ActiveWorkbook;
-
-            try
-            {
-
-                Excel.Worksheet ExcelSheet = ExcelWorkbook.Sheets.Add();
-
-                var rowsCount = obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 3;
-                var columnsCount = obj.Set.Count + 3;
-
-                Excel.Range ExcelRange = ExcelSheet.Range[ExcelSheet.Cells[1, 1], ExcelSheet.Cells[rowsCount, columnsCount]];
-
-                ExcelSheet.Name = obj.Set.First().Project + " - Сет № " + obj.Set.First().Set;
-
-
-                var data = PrepareListForSet2(obj);
-
-
-                ExcelRange.Value = data;
-                FormatSheetForSet2(ExcelSheet, obj);
-
-
-
-                //ExcelWorkbook.Sheets[1].Delete();
-                //ExcelWorkbook.Sheets[1].Delete();
-                //ExcelWorkbook.Sheets[1].Delete();
-
-                ExcelApp.ScreenUpdating = true;
-                ExcelApp.Visible = true;
-            }
-            catch (Exception ex)
-            {
-
-            }
-            finally
-            {
-                ExcelWorkbook = null;
-                ExcelApp = null;
-                GC.Collect();
-            }
-        }
 
         private static object[,] PrepareListForSet1(SetItem obj)
         {

@@ -28,12 +28,12 @@ namespace MlabToExcelExport
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             SetViewModel data = new SetViewModel();
-   ExportToExcel.GetExcelDocumentSet1(data);
+   MessageBox.Show(ExportToExcel.GetExcelDocumentSet(data, null,1));
         }
         private void Button_Click_Other(object sender, RoutedEventArgs e)
         {
             SetViewModel data = new SetViewModel();
-            ExportToExcel.GetExcelDocumentSet2(data);
+            MessageBox.Show(ExportToExcel.GetExcelDocumentSet(data, null, 2));
         }
     }
 }
