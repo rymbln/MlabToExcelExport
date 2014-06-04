@@ -2,10 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:DataMlabToExcelExport="clr-namespace:MlabToExcelExport"
+        xmlns:mlabSetToExcelLibrary="clr-namespace:MlabSetToExcelLibrary;assembly=MlabSetToExcelLibrary"
 
         Title="MainWindow" Height="350" Width="525">
     <Window.DataContext>
-        <DataMlabToExcelExport:SetViewModel />
+        <mlabSetToExcelLibrary:SetViewModel />
     </Window.DataContext>
     <ScrollViewer>
         <StackPanel>
