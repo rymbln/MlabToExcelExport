@@ -84,7 +84,7 @@ namespace MlabToExcelExport
            
 
 
-            sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 5] = "Проверил:";
+            sheet.Cells[obj.Set.First().MOList.Count + obj.Set.First().ControlMOList.Count + 7,2] = "Проверил:";
         }
         private static void FormatSheetForSet1(Excel.Worksheet sheet, SetItem obj)
         {
@@ -143,7 +143,7 @@ namespace MlabToExcelExport
             sheet.Range[sheet.Cells[5, obj.MICList.Count + 5], sheet.Cells[5 + obj.MOList.Count, obj.MICList.Count + 5]].ColumnWidth = 8;
 
 
-            sheet.Cells[obj.MOList.Count + obj.ControlMOList.Count + 10] = "Проверил:";
+            sheet.Cells[obj.MOList.Count + obj.ControlMOList.Count + 10, 2] = "Проверил:";
         }
 
         private static void FormatHeaderText1(Excel.Range range)
