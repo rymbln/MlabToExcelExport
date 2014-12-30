@@ -29,7 +29,7 @@ namespace MlabToExcelExport
 
         private MlabSetToExcelLibrary.SetViewModel GenerateSet()
         {
-          
+
             double startMIC = 0.125;
             var MIClist = new List<double>();
             for (int i = 1; i <= 10; i++)
@@ -47,7 +47,7 @@ namespace MlabToExcelExport
             }
 
             var MOlist = new List<SetRow>();
-            for (int i = 1; i <= 40; i++)
+            for (int i = 1; i <= 96; i++)
             {
                 MOlist.Add(new SetRow
                 {
@@ -95,13 +95,25 @@ namespace MlabToExcelExport
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             SetViewModel data = GenerateSet();
-      
-   MessageBox.Show(MlabSetToExcelLibrary.ExportToExcel.GetExcelDocumentSet(data, null,1));
+
+            MessageBox.Show(MlabSetToExcelLibrary.ExportToExcel.GetExcelDocumentSet(data, null, 1));
         }
         private void Button_Click_Other(object sender, RoutedEventArgs e)
         {
             SetViewModel data = GenerateSet();
             MessageBox.Show(MlabSetToExcelLibrary.ExportToExcel.GetExcelDocumentSet(data, null, 2));
         }
+        private void Button_Click_Other2(object sender, RoutedEventArgs e)
+        {
+            if (MlabSetToExcelLibrary.ExportToExcel.OpenExcelDocument(@"C:\Users\Inspiron\Desktop\maestro_output.xls") == 1)
+          {
+              MessageBox.Show("File OPened Succesfully");
+          }
+          else
+          {
+              MessageBox.Show("Can not open file, probabli incorrect filename");
+          }
+        }
+
     }
 }
