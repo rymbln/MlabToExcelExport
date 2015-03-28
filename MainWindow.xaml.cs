@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MlabSetToExcelLibrary;
+
 
 namespace MlabToExcelExport
 {
@@ -27,7 +27,7 @@ namespace MlabToExcelExport
             InitializeComponent();
         }
 
-        private MlabSetToExcelLibrary.SetViewModel GenerateSet()
+        private SetViewModel GenerateSet()
         {
 
             double startMIC = 0.125;
@@ -47,13 +47,13 @@ namespace MlabToExcelExport
             }
 
             var MOlist = new List<SetRow>();
-            for (int i = 1; i <= 96; i++)
+            for (int i = 2; i <= 93; i++)
             {
                 MOlist.Add(new SetRow
                 {
                     Cell = "A" + i,
                     MO = "Oranism " + i,
-                    MuseumNumber = (120 + i).ToString(),
+                    MuseumNumber = "MARAFON-"+(120 + i).ToString(),
                     Number = i
                 });
             }
@@ -96,16 +96,16 @@ namespace MlabToExcelExport
         {
             SetViewModel data = GenerateSet();
 
-            MessageBox.Show(MlabSetToExcelLibrary.ExportToExcel.GetExcelDocumentSet(data, null, 1));
+            MessageBox.Show(ExportToExcel.GetExcelDocumentSetPDF(data, null, 1));
         }
         private void Button_Click_Other(object sender, RoutedEventArgs e)
         {
             SetViewModel data = GenerateSet();
-            MessageBox.Show(MlabSetToExcelLibrary.ExportToExcel.GetExcelDocumentSet(data, null, 2));
+            MessageBox.Show(ExportToExcel.GetExcelDocumentSet(data, null, 2));
         }
         private void Button_Click_Other2(object sender, RoutedEventArgs e)
         {
-            if (MlabSetToExcelLibrary.ExportToExcel.OpenExcelDocument(@"C:\Users\Inspiron\Desktop\maestro_output.xls") == 1)
+            if (ExportToExcel.OpenExcelDocument(@"C:\Users\Inspiron\Desktop\maestro_output.xls") == 1)
           {
               MessageBox.Show("File OPened Succesfully");
           }
