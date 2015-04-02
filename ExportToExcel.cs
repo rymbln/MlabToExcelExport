@@ -454,10 +454,10 @@ namespace MlabToExcelExport
 
             // Mic
             var micCount = itemSet.MICList.Count;
-            double micWidth = ((doc.DefaultPageSetup.PageWidth.Centimeter - section.PageSetup.LeftMargin.Centimeter - section.PageSetup.RightMargin.Centimeter - 4.6)
+            double micWidth = ((doc.DefaultPageSetup.PageWidth.Centimeter - 5.5*(section.PageSetup.LeftMargin.Centimeter + section.PageSetup.RightMargin.Centimeter) )
                 / micCount);
 
-            for (int j = 0; j < micCount - 1; j++)
+            for (int j = 0; j < micCount ; j++)
             {
                 column = table.AddColumn(micWidth.ToString() + "cm");
                 column.Format.Alignment = ParagraphAlignment.Center;
@@ -488,14 +488,14 @@ namespace MlabToExcelExport
             cell.AddParagraph("МО");
             cell.VerticalAlignment = VerticalAlignment.Center;
 
-            for (int j = 0; j < micCount - 1; j++)
+            for (int j = 0; j < micCount ; j++)
             {
                 cell = row.Cells[3 + j];
                 cell.VerticalAlignment = VerticalAlignment.Center;
                 cell.AddParagraph(itemSet.MICList[j].ToString());
             }
 
-            cell = row.Cells[2 + micCount];
+            cell = row.Cells[3 + micCount];
             cell.VerticalAlignment = VerticalAlignment.Center;
             cell.AddParagraph("МПК");
         }
@@ -511,12 +511,21 @@ namespace MlabToExcelExport
                 renderer.Document = doc;
                 renderer.RenderDocument();
 
-                // Save the document...
-                string filename = "SET_" + DateTime.Now.ToShortDateString() + ".pdf";
-                renderer.PdfDocument.Save(filename);
+                if (String.IsNullOrEmpty(filePath))
+                {
+                    filePath = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)).FullName;
+                    //if (Environment.OSVersion.Version.Major >= 6)
+                    //{
+                    //    filePath = Directory.GetParent(filePath).FullName;
+                    //}
+                }
+                filename = obj.Set.First().Project + " - Сет " + obj.Set.First().Set + " - " + obj.Set.First().TestMethod + ".pdf";
+
+
+                renderer.PdfDocument.Save(filePath + "\\" + filename);
                 // ...and start a viewer.
-                Process.Start(filename);
-                return filename;
+                Process.Start(filePath + "\\" + filename);
+                return filePath + "\\" + filename;
             }
             catch (Exception ex)
             {
